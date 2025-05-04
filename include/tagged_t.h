@@ -12,6 +12,10 @@ public:
   explicit constexpr tagged_t(const T& value) : value_(value) {}
   explicit constexpr tagged_t(T&& value) : value_(std::move(value)) {}
 
+  constexpr tagged_t()
+    requires std::default_initializable<T>
+  = default;
+
   tagged_t(const tagged_t&) = default;
   tagged_t(tagged_t&&) = default;
   tagged_t& operator=(const tagged_t&) = default;
@@ -41,7 +45,7 @@ public:
 
   constexpr tagged_t
   operator--(int) noexcept(noexcept(tagged_t(std::declval<const T&>())) &&
-                           noexcept(std::declval<T&>()++))
+                           noexcept(std::declval<T&>()--))
 
   {
     tagged_t ret = *this;
@@ -77,10 +81,53 @@ MAKE_OP(+);
 MAKE_OP(-);
 MAKE_OP(/);
 MAKE_OP(*);
+MAKE_OP(%);
 MAKE_OP(|);
 MAKE_OP(^);
 MAKE_OP(&);
+MAKE_OP(<<);
+MAKE_OP(>>);
 
 #undef MAKE_OP
+
+#define MAKE_OP_ASSIGN(OP)                                                     \
+  template <class T, class Tag>                                                \
+    requires requires(T& a, const T& b) { a OP## = b; }                        \
+  constexpr tagged_t<T, Tag>& operator OP##=(                                  \
+      tagged_t<T, Tag>& lhs,                                                   \
+      const tagged_t<T, Tag>& rhs) noexcept(noexcept(lhs.get()                 \
+                                                         OP rhs.get())) {      \
+    lhs.get() OP## = rhs.get();                                                \
+    return lhs;                                                                \
+  }
+
+MAKE_OP_ASSIGN(+);
+MAKE_OP_ASSIGN(-);
+MAKE_OP_ASSIGN(/);
+MAKE_OP_ASSIGN(*);
+MAKE_OP_ASSIGN(%);
+MAKE_OP_ASSIGN(|);
+MAKE_OP_ASSIGN(^);
+MAKE_OP_ASSIGN(&);
+MAKE_OP_ASSIGN(<<);
+MAKE_OP_ASSIGN(>>);
+
+#undef MAKE_OP_ASSIGN
+
+// unary +
+template <class T, class Tag>
+  requires requires(const T& a) { +a; }
+constexpr auto
+operator+(const tagged_t<T, Tag>& v) noexcept(noexcept(+v.get())) {
+  return tagged_t<T, Tag>{+v.get()};
+}
+
+// unary -
+template <class T, class Tag>
+  requires requires(const T& a) { -a; }
+constexpr auto
+operator-(const tagged_t<T, Tag>& v) noexcept(noexcept(-v.get())) {
+  return tagged_t<T, Tag>{-v.get()};
+}
 
 #define MAKE_TAGGED(name, type) using name = tagged_t<type, struct Tag_##name>;
