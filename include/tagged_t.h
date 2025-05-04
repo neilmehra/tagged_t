@@ -152,7 +152,7 @@ std::ostream& operator<<(std::ostream& os, const tagged_t<T, Tag>& val) {
 
 template <class T, class Tag>
   requires requires(std::istream& is, T& val) { is >> val; }
-std::istream& operator<<(std::ostream& is, tagged_t<T, Tag>& val) {
+std::istream& operator>>(std::ostream& is, tagged_t<T, Tag>& val) {
   return is >> val.get();
 }
 

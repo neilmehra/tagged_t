@@ -1,33 +1,28 @@
 cmake_minimum_required(VERSION 3.14)
 project(tagged_t LANGUAGES CXX)
 
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable testing
 enable_testing()
 
-# Add the include directory for your project
 include_directories(include)
 
-# Add source files
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+add_library(tagged_t INTERFACE)
 
-# Create a library from your source files
-add_library(tagged_t STATIC ${SOURCES})
-target_include_directories(tagged_t PUBLIC include)
+target_include_directories(tagged_t
+  INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
 
-# Fetch Google Test
 include(FetchContent)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
 )
-# Download and build Google Test
 FetchContent_MakeAvailable(googletest)
 
-# Link Google Test to test executables
 file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
 foreach(TEST_SOURCE ${TEST_SOURCES})
     # Extract the test name from the file name
