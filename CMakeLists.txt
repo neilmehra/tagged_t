@@ -32,3 +32,10 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endforeach()
 
+
+file(GLOB EXAMPLES_SOURCES "examples/*.cpp")
+foreach(example_src ${EXAMPLES_SOURCES})
+  get_filename_component(example_name ${example_src} NAME_WE)
+  add_executable(${example_name} ${example_src})
+  target_link_libraries(${example_name} PRIVATE tagged_t)
+endforeach()

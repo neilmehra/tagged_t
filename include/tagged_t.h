@@ -122,7 +122,6 @@ MAKE_OP_ASSIGN(>>);
 
 #undef MAKE_OP_ASSIGN
 
-// unary +
 template <class T, class Tag>
   requires requires(const T& a) { +a; }
 constexpr auto
@@ -137,7 +136,6 @@ operator-(const tagged_t<T, Tag>& v) noexcept(noexcept(-v.get())) {
   return tagged_t<T, Tag>{-v.get()};
 }
 
-// swappable
 template <class T, class Tag>
   requires std::swappable<T>
 constexpr void swap(tagged_t<T, Tag>& lhs, tagged_t<T, Tag>& rhs) {
@@ -152,16 +150,15 @@ std::ostream& operator<<(std::ostream& os, const tagged_t<T, Tag>& val) {
 
 template <class T, class Tag>
   requires requires(std::istream& is, T& val) { is >> val; }
-std::istream& operator>>(std::ostream& is, tagged_t<T, Tag>& val) {
+std::istream& operator>>(std::istream& is, tagged_t<T, Tag>& val) {
   return is >> val.get();
 }
 
-// hash support
 namespace std {
 template <class T, class Tag> struct hash<tagged_t<T, Tag>> {
-  std::size_t operator()(const tagged_t<T, Tag>& v) const
-      noexcept(noexcept(std::hash<T>()(v.get()))) {
-    return std::hash<T>(v.get());
+  size_t operator()(const tagged_t<T, Tag>& v) const
+      noexcept(noexcept(std::hash<T>{}(v.get()))) {
+    return std::hash<T>{}(v.get());
   }
 };
 } // namespace std
