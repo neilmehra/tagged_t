@@ -1,3 +1,3 @@
 # tagged_t
 
-Header for strongly typed `typedef`'s with tagged types
+Header file for strongly typed `typedef`'s through tagged (phantom) types
