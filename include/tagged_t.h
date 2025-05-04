@@ -1,10 +1,8 @@
 #pragma once
 
-#include <compare>
 #include <concepts>
 #include <cstddef>
 #include <ostream>
-#include <type_traits>
 #include <utility>
 
 template <class T, class Tag> class tagged_t {

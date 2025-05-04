@@ -4,6 +4,23 @@ project(tagged_t LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(GCC_WARNINGS
+  -Wall
+  -Wextra
+  -Wpedantic
+  -Wconversion
+  -Wsign-conversion
+  -Wshadow
+  -Wnull-dereference
+  -Wduplicated-cond
+  -Wduplicated-branches
+  -Wlogical-op
+  -Wrestrict
+  -Werror
+)
+
+add_compile_options(${GCC_WARNINGS})
+
 # for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
