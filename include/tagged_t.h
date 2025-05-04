@@ -2,6 +2,9 @@
 
 #include <compare>
 #include <concepts>
+#include <cstddef>
+#include <ostream>
+#include <type_traits>
 #include <utility>
 
 template <class T, class Tag> class tagged_t {
@@ -22,8 +25,13 @@ public:
   tagged_t& operator=(tagged_t&&) = default;
   ~tagged_t() = default;
 
-  constexpr const T& get() const noexcept { return value_; }
+  [[nodiscard]] constexpr const T& get() const noexcept { return value_; }
   constexpr T& get() noexcept { return value_; }
+
+  [[nodiscard]] constexpr explicit operator const T&() const noexcept {
+    return value_;
+  }
+  constexpr explicit operator T&() noexcept { return value_; }
 
   constexpr tagged_t& operator++() noexcept(noexcept(++std::declval<T&>())) {
     ++value_;
@@ -122,12 +130,40 @@ operator+(const tagged_t<T, Tag>& v) noexcept(noexcept(+v.get())) {
   return tagged_t<T, Tag>{+v.get()};
 }
 
-// unary -
 template <class T, class Tag>
   requires requires(const T& a) { -a; }
 constexpr auto
 operator-(const tagged_t<T, Tag>& v) noexcept(noexcept(-v.get())) {
   return tagged_t<T, Tag>{-v.get()};
 }
+
+// swappable
+template <class T, class Tag>
+  requires std::swappable<T>
+constexpr void swap(tagged_t<T, Tag>& lhs, tagged_t<T, Tag>& rhs) {
+  std::swap(lhs.get(), rhs.get());
+}
+
+template <class T, class Tag>
+  requires requires(std::ostream& os, const T& val) { os << val; }
+std::ostream& operator<<(std::ostream& os, const tagged_t<T, Tag>& val) {
+  return os << val.get();
+}
+
+template <class T, class Tag>
+  requires requires(std::istream& is, T& val) { is >> val; }
+std::istream& operator<<(std::ostream& is, tagged_t<T, Tag>& val) {
+  return is >> val.get();
+}
+
+// hash support
+namespace std {
+template <class T, class Tag> struct hash<tagged_t<T, Tag>> {
+  std::size_t operator()(const tagged_t<T, Tag>& v) const
+      noexcept(noexcept(std::hash<T>()(v.get()))) {
+    return std::hash<T>(v.get());
+  }
+};
+} // namespace std
 
 #define MAKE_TAGGED(name, type) using name = tagged_t<type, struct Tag_##name>;

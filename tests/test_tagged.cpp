@@ -18,6 +18,8 @@ TEST(tagged_t, Test) {
   auto loo = moo - SpecialInt{1};
   loo++;
   EXPECT_TRUE(moo == loo);
+
+  int test_conv = moo;
 }
 
 int main(int argc, char** argv) {
