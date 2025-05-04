@@ -28,5 +28,9 @@ CTestTestfile.cmake
 *.exe
 *.dll
 
+# clangd cache index
+.cache/
+
 
 !/Makefile
+

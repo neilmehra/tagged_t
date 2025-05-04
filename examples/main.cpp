@@ -1,16 +1,15 @@
-#include "../include/tagged_t.h"
+#include "tagged_t.h"
 #include <algorithm>
 #include <iostream>
 #include <vector>
 
-MAKE_TAGGED(Meters, double)
-MAKE_TAGGED(Seconds, double)
+MAKE_TAGGED(Meters, double);
+MAKE_TAGGED(Seconds, double);
 
 int main() {
   Meters d1{3.5}, d2{2.1};
   Seconds t1{1.2}, t2{4.8};
 
-  // arithmetic
   auto d3 = d1 + d2; // 5.6 meters
   auto t3 = t2 - t1; // 3.6 seconds
 
